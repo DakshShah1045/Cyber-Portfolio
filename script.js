@@ -399,4 +399,100 @@ window.addEventListener('load', () => {
 });
 
 console.log('%c🚀 Portfolio Loaded Successfully! ', 'background: #00f0ff; color: #0a0a0f; font-size: 16px; padding: 10px; font-weight: bold;');
+
 console.log('%cBuilt with passion by Daksh Shah', 'color: #00f0ff; font-size: 12px;');
+
+  const galleryContainer = document.getElementById('galleryContainer');
+        const slides = document.querySelectorAll('.gallery-slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentSlideEl = document.getElementById('currentSlide');
+        const totalSlidesEl = document.getElementById('totalSlides');
+        const indicatorsContainer = document.getElementById('indicators');
+
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+        const revealEffects = ['reveal-glitch', 'reveal-scan', 'reveal-pixel', 'reveal-hologram'];
+
+        // Update total slides
+        totalSlidesEl.textContent = totalSlides.toString().padStart(2, '0');
+
+        // Create indicators
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'indicator-dot';
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            indicatorsContainer.appendChild(dot);
+        }
+
+        const indicators = document.querySelectorAll('.indicator-dot');
+
+        function updateSlide(newIndex) {
+            // Remove active and animation classes
+            slides[currentIndex].classList.remove('active');
+            revealEffects.forEach(effect => slides[currentIndex].classList.remove(effect));
+            indicators[currentIndex].classList.remove('active');
+
+            currentIndex = newIndex;
+
+            // Add active class and random reveal effect
+            const randomEffect = revealEffects[Math.floor(Math.random() * revealEffects.length)];
+            slides[currentIndex].classList.add('active', randomEffect);
+            indicators[currentIndex].classList.add('active');
+
+            // Update counter
+            currentSlideEl.textContent = (currentIndex + 1).toString().padStart(2, '0');
+
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                slides[currentIndex].classList.remove(randomEffect);
+            }, 1200);
+        }
+
+        function nextSlide() {
+            const newIndex = (currentIndex + 1) % totalSlides;
+            updateSlide(newIndex);
+        }
+
+        function prevSlide() {
+            const newIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            updateSlide(newIndex);
+        }
+
+        function goToSlide(index) {
+            if (index !== currentIndex) {
+                updateSlide(index);
+            }
+        }
+
+        // Event listeners
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+        });
+
+        // Touch/Swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        galleryContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        galleryContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) nextSlide();
+            if (touchEndX > touchStartX + 50) prevSlide();
+        }
+
+        // Auto-play (optional - uncomment to enable)
+        // setInterval(nextSlide, 5000);
